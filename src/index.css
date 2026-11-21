@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --pb-white: #ffffff;
+  --pb-gallery: #fbfbfd;
+  --pb-alabaster: #f5f5f7;
+  --pb-obsidian: #121212;
+  --pb-studio: #0a0a0c;
+  --pb-signal: #ea6b1a;
+  --pb-signal-glow: #ff7d29;
+  --pb-hairline-light: rgba(18, 18, 18, 0.08);
+  --pb-hairline-dark: rgba(255, 255, 255, 0.1);
+}
+
+/* CRITICAL: Use overflow-x: clip instead of hidden so position: sticky works reliably */
+html {
+  scroll-behavior: smooth;
+  overflow-x: clip;
+}
+
+body {
+  overflow-x: clip;
+  background-color: #ffffff;
+  color: #121212;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background-color: rgba(234, 107, 26, 0.18);
+  color: #121212;
+}
+
+/* Minimalist scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(18, 18, 18, 0.18);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(234, 107, 26, 0.7);
+}
+
+@layer utilities {
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bg-dot-matrix-light {
+    background-image: radial-gradient(rgba(18, 18, 18, 0.11) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .bg-dot-matrix-dark {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.11) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .bg-architectural-grid-light {
+    background-image:
+      linear-gradient(to right, rgba(18, 18, 18, 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(18, 18, 18, 0.045) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+
+  .bg-architectural-grid-dark {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+}
+
+@keyframes marqueeLeft {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes marqueeRight {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-marquee-left {
+  animation: marqueeLeft 42s linear infinite;
+}
+
+.animate-marquee-right {
+  animation: marqueeRight 46s linear infinite;
+}
+
+.animate-marquee-slow-left {
+  animation: marqueeLeft 58s linear infinite;
+}
+
+.animate-marquee-slow-right {
+  animation: marqueeRight 64s linear infinite;
+}
+
+.marquee-pause-hover:hover .marquee-track {
+  animation-play-state: paused;
+}
