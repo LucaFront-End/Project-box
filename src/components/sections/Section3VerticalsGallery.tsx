@@ -249,37 +249,48 @@ export const Section3VerticalsGallery: React.FC = () => {
                 </div>
 
                 {/* Minimal Action Row */}
-                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 pt-1">
-                  <Link
-                    to={`/especialidad/${activeVertical.id}`}
-                    className="inline-flex items-center gap-1.5 h-10 px-5 rounded-full bg-obsidian hover:bg-signal text-white text-xs font-medium transition-colors cursor-pointer"
-                  >
-                    <span>Ver línea</span>
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                  </Link>
+                <div className="space-y-3 pt-1">
+                  <div className="flex items-baseline justify-center lg:justify-start gap-2">
+                    <span className="font-mono text-lg font-semibold text-obsidian tabular-nums">
+                      {formatMxn(heroProduct.priceMxn)}
+                    </span>
+                    <span className="font-mono text-[10px] text-graphite uppercase tracking-wider">
+                      MXN · Stock real
+                    </span>
+                  </div>
 
-                  <button
-                    type="button"
-                    onClick={() => addProduct(heroProduct)}
-                    title={`${heroProduct.name} (${formatMxn(heroProduct.priceMxn)})`}
-                    className={`inline-flex items-center gap-1.5 h-10 px-4 rounded-full text-xs font-mono border transition-colors cursor-pointer ${
-                      isAdded
-                        ? 'bg-emerald-600 text-white border-emerald-600'
-                        : 'bg-white/80 text-obsidian border-obsidian/15 hover:border-obsidian/40'
-                    }`}
-                  >
-                    {isAdded ? (
-                      <>
-                        <Check className="w-3.5 h-3.5" />
-                        <span>En Box</span>
-                      </>
-                    ) : (
-                      <>
-                        <Plus className="w-3.5 h-3.5 text-signal" />
-                        <span>{heroProduct.sku}</span>
-                      </>
-                    )}
-                  </button>
+                  <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5">
+                    <Link
+                      to={`/especialidad/${activeVertical.id}`}
+                      className="inline-flex items-center gap-1.5 h-10 px-5 rounded-full bg-obsidian hover:bg-signal text-white text-xs font-medium transition-colors cursor-pointer"
+                    >
+                      <span>Ver tienda</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </Link>
+
+                    <button
+                      type="button"
+                      onClick={() => addProduct(heroProduct)}
+                      title={`${heroProduct.name} (${formatMxn(heroProduct.priceMxn)})`}
+                      className={`inline-flex items-center gap-1.5 h-10 px-4 rounded-full text-xs font-mono border transition-colors cursor-pointer ${
+                        isAdded
+                          ? 'bg-emerald-600 text-white border-emerald-600'
+                          : 'bg-white/80 text-obsidian border-obsidian/15 hover:border-obsidian/40'
+                      }`}
+                    >
+                      {isAdded ? (
+                        <>
+                          <Check className="w-3.5 h-3.5" />
+                          <span>En Box</span>
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="w-3.5 h-3.5 text-signal" />
+                          <span>{heroProduct.sku}</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             </AnimatePresence>

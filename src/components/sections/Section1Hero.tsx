@@ -1,134 +1,280 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { ArrowDownRight, Search, ShieldCheck } from 'lucide-react';
-import { IsometricHeroRig } from '../visuals/IsometricHeroRig';
-import { MagneticButton } from '../ui/MagneticButton';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+  ArrowLeft,
+  ArrowRight,
+  ArrowUpRight,
+  Check,
+  Move3d,
+  Plus,
+} from 'lucide-react';
+import { CATALOG_PRODUCTS, formatMxn, getProductImage } from '../../data/catalog';
 import { useBox } from '../../context/BoxContext';
+import {
+  ProductSlider3D,
+  resolveProduct3DKind,
+} from '../visuals/ProductSlider3D';
 
-const HERO_PROOFS = [
-  { code: '100K+', label: 'SKUs activos en catálogo' },
-  { code: '24–48H', label: 'Envío asegurado nacional' },
-  { code: 'B2B / B2C', label: 'Esquema a integradores' },
-  { code: 'GDL · MX', label: 'Ingeniería & garantías' },
+interface HeroSlideConfig {
+  sku: string;
+  headline: string;
+  microSpec: string;
+}
+
+const HERO_SLIDES: HeroSlideConfig[] = [
+  {
+    sku: 'HK-DS2CD2387G2',
+    headline: 'Cámara 4K ColorVu.',
+    microSpec: 'Visión nocturna F1.0 a color real · Analítica IA AcuSense · PoE IP67',
+  },
+  {
+    sku: 'UBQ-USW-PROMAX48',
+    headline: 'Switch 48P 10G.',
+    microSpec: 'Puertos Etherlighting 2.5GbE · 720W PoE++ · 4x 10G SFP+ redundantes',
+  },
+  {
+    sku: 'EP-INV-HYB10K',
+    headline: 'Inversor Solar 10kW.',
+    microSpec: 'Híbrido bifásico Split-Phase · Doble MPPT · Compatible LiFePO4 48V',
+  },
+  {
+    sku: 'HYT-HP786-UHF',
+    headline: 'Radio Digital DMR.',
+    microSpec: 'Audio IA con supresión de viento · Sumergible IP68 · Autonomía 24 h',
+  },
+];
+
+const HERO_TRUST_BAR = [
+  { metric: 'Envío hoy', label: 'Despacho asegurado desde GDL & CDMX' },
+  { metric: 'Precios B2B', label: 'Descuento preferencial a integradores' },
+  { metric: '100,000+ SKUs', label: 'Catálogo mayorista con stock en vivo' },
+  { metric: 'Garantía MX', label: 'Soporte técnico y póliza oficial directa' },
 ];
 
 export const Section1Hero: React.FC = () => {
-  const { openSearch } = useBox();
+  const { addProduct, isDistributorPricing, lastAddedId } = useBox();
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
 
-  const scrollToArchitecture = () => {
-    document.getElementById('arquitectura')?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const slides = useMemo(() => {
+    return HERO_SLIDES.map((cfg) => {
+      const product =
+        CATALOG_PRODUCTS.find((p) => p.sku === cfg.sku) || CATALOG_PRODUCTS[0];
+      return {
+        ...cfg,
+        product,
+        kind: resolveProduct3DKind(product.sku, product.verticalId),
+      };
+    });
+  }, []);
+
+  const current = slides[activeIndex];
+  const currentPrice = isDistributorPricing
+    ? Math.round(
+      current.product.priceMxn *
+      (1 - current.product.distributorDiscountPct / 100)
+    )
+    : current.product.priceMxn;
+
+  const isAdded = lastAddedId === current.product.id;
+
+  const goNext = useCallback(() => {
+    setActiveIndex((prev) => (prev + 1) % slides.length);
+  }, [slides.length]);
+
+  const goPrev = useCallback(() => {
+    setActiveIndex((prev) => (prev - 1 + slides.length) % slides.length);
+  }, [slides.length]);
+
+  useEffect(() => {
+    if (isPaused) return;
+    const timer = window.setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % slides.length);
+    }, 6500);
+    return () => window.clearInterval(timer);
+  }, [isPaused, slides.length]);
+
+  const slideLabel = `${String(activeIndex + 1).padStart(2, '0')} / ${String(
+    slides.length
+  ).padStart(2, '0')}`;
 
   return (
     <section
-      id="hero"
+      id="ecosistema"
       data-theme="light"
-      className="relative min-h-screen bg-white text-obsidian pt-[74px] flex flex-col justify-between overflow-hidden"
+      className="relative bg-white overflow-x-clip min-h-[calc(100vh-58px)] flex flex-col justify-between pt-[92px] pb-12 lg:pt-[112px] lg:pb-16"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Subtle Architectural Dot Matrix fading at edges */}
-      <div
-        className="absolute inset-0 bg-dot-matrix-light opacity-60 pointer-events-none"
-        style={{
-          maskImage: 'radial-gradient(ellipse 75% 70% at 50% 45%, black 30%, transparent 100%)',
-          WebkitMaskImage:
-            'radial-gradient(ellipse 75% 70% at 50% 45%, black 30%, transparent 100%)',
-        }}
-      />
+      <div className="max-w-[1440px] w-full mx-auto px-6 lg:px-12 flex-1 flex flex-col justify-between">
+        <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-10 lg:gap-8 flex-1 py-4 lg:py-8">
+          {/* Left: Minimalist E-Commerce Product Specs & CTAs */}
+          <div className="lg:col-span-5 space-y-7 order-2 lg:order-1">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={current.product.sku}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.28, ease: 'easeOut' }}
+                className="space-y-6"
+              >
+                {/* Kicker */}
+                <div className="flex items-center gap-2.5 text-[11px] font-mono uppercase tracking-[0.16em] text-graphite">
+                  <span className="text-obsidian font-semibold">{slideLabel}</span>
+                  <span>·</span>
+                  <span className="text-signal font-semibold">{current.product.brand}</span>
+                  <span>·</span>
+                  <span className="inline-flex items-center gap-1.5 text-emerald-700">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    EN STOCK
+                  </span>
+                </div>
 
-      {/* Main Content Grid */}
-      <div className="relative z-10 max-w-[1320px] w-full mx-auto px-5 md:px-8 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-6 items-center py-4 md:py-8">
-        {/* Left Editorial Typography */}
-        <div className="lg:col-span-6 space-y-7 text-center lg:text-left">
-          <motion.div
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-alabaster border border-obsidian/[0.08]"
-          >
-            <span className="w-2 h-2 rounded-full bg-signal animate-pulse-soft" />
-            <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.18em] text-obsidian/80">
-              Infraestructura · Telecom · Seguridad · Energía
-            </span>
-          </motion.div>
+                {/* Display Headline */}
+                <div className="space-y-3">
+                  <h1 className="text-4xl sm:text-[54px] lg:text-[60px] font-semibold tracking-tight text-obsidian leading-[1.01]">
+                    {current.headline}
+                  </h1>
+                  <p className="text-base lg:text-[17px] text-graphite leading-relaxed max-w-[44ch]">
+                    {current.microSpec}
+                  </p>
+                </div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.72, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-            className="font-sans font-semibold text-[44px] sm:text-[62px] xl:text-[74px] leading-[1.02] tracking-editorial text-obsidian"
-          >
-            Infraestructura crítica.
-            <br />
-            <span className="text-obsidian/35">En una sola</span>{' '}
-            <span className="relative inline-block">
-              caja<span className="text-signal">.</span>
-            </span>
-          </motion.h1>
+                {/* Pricing */}
+                <div className="flex items-baseline gap-3 pt-1">
+                  <span className="text-3xl sm:text-[38px] font-semibold text-obsidian tabular-nums tracking-tight">
+                    {formatMxn(currentPrice)}
+                  </span>
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-[11px] font-mono font-medium text-emerald-800">
+                    -{current.product.distributorDiscountPct}% B2B
+                  </span>
+                </div>
 
-          <motion.p
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.72, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
-            className="max-w-[520px] mx-auto lg:mx-0 text-[16px] sm:text-[18px] leading-relaxed text-graphite font-normal"
-          >
-            Marketplace tecnológico de ingeniería para integradores y empresas en México.
-            Redes 10G, videovigilancia IA, respaldo solar y cómputo en un ecosistema unificado.
-          </motion.p>
+                {/* Essential CTAs */}
+                <div className="flex flex-wrap items-center gap-3 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => addProduct(current.product)}
+                    className={`inline-flex items-center justify-center gap-2 h-[52px] px-7 rounded-full text-sm font-medium transition-all cursor-pointer ${isAdded
+                        ? 'bg-emerald-600 text-white shadow-[0_8px_24px_rgba(5,150,105,0.28)]'
+                        : 'bg-signal hover:bg-signal-glow text-white shadow-[0_10px_28px_rgba(234,107,26,0.26)]'
+                      }`}
+                  >
+                    {isAdded ? (
+                      <>
+                        <Check className="w-4 h-4" />
+                        <span>Agregado</span>
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-4 h-4" />
+                        <span>Agregar al carrito</span>
+                      </>
+                    )}
+                  </button>
 
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-wrap items-center justify-center lg:justify-start gap-3.5 pt-1"
-          >
-            <MagneticButton variant="obsidian" size="lg" onClick={scrollToArchitecture}>
-              <span>Explorar arquitectura</span>
-              <ArrowDownRight className="w-4 h-4 text-signal" />
-            </MagneticButton>
+                  <Link
+                    to={`/producto/${current.product.sku}`}
+                    className="inline-flex items-center gap-1.5 h-[52px] px-6 rounded-full border border-obsidian/15 hover:border-obsidian/40 text-sm font-medium text-obsidian transition-colors"
+                  >
+                    <span>Ver ficha</span>
+                    <ArrowUpRight className="w-4 h-4 text-graphite" />
+                  </Link>
+                </div>
+              </motion.div>
+            </AnimatePresence>
 
-            <MagneticButton variant="ghost-dark" size="lg" onClick={() => openSearch('')}>
-              <Search className="w-4 h-4 text-graphite" />
-              <span>Buscar catálogo</span>
-              <kbd className="font-mono text-[10px] text-graphite/80 ml-1">⌘K</kbd>
-            </MagneticButton>
-          </motion.div>
+            {/* Minimalist Slider Controls + Quick Catalog Link */}
+            <div className="pt-6 border-t border-obsidian/[0.08] flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={goPrev}
+                    aria-label="Producto anterior"
+                    className="w-10 h-10 rounded-full border border-obsidian/15 hover:border-obsidian/45 flex items-center justify-center text-obsidian transition-colors cursor-pointer"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={goNext}
+                    aria-label="Siguiente producto"
+                    className="w-10 h-10 rounded-full border border-obsidian/15 hover:border-obsidian/45 flex items-center justify-center text-obsidian transition-colors cursor-pointer"
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.35 }}
-            className="hidden sm:flex items-center justify-center lg:justify-start gap-2 text-xs text-graphite pt-1"
-          >
-            <ShieldCheck className="w-4 h-4 text-signal" />
-            <span>Distribución oficial · Garantía directa y envíos asegurados a todo el país</span>
-          </motion.div>
+                {/* Progress Indicator Tabs */}
+                <div className="flex items-center gap-1.5 pl-1">
+                  {slides.map((s, idx) => {
+                    const active = idx === activeIndex;
+                    return (
+                      <button
+                        key={s.sku}
+                        type="button"
+                        onClick={() => setActiveIndex(idx)}
+                        aria-label={`Ver ${s.headline}`}
+                        className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${active
+                            ? 'w-7 bg-obsidian'
+                            : 'w-2 bg-obsidian/20 hover:bg-obsidian/40'
+                          }`}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+
+              <Link
+                to="/tienda"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-graphite hover:text-obsidian transition-colors group"
+              >
+                <span>Explorar tienda completa</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Right: Spacious Frameless Floating 3D Slider Stage */}
+          <div className="lg:col-span-7 relative order-1 lg:order-2 h-[440px] sm:h-[540px] lg:h-[640px] xl:h-[690px]">
+            <ProductSlider3D
+              kind={current.kind}
+              slideKey={`${current.product.sku}-${activeIndex}`}
+              onInteract={() => setHasInteracted(true)}
+              fallbackImage={getProductImage(current.product)}
+              fallbackAlt={current.product.name}
+            />
+
+            {/* Subtle vanishing 360 drag prompt */}
+            <AnimatePresence>
+              {!hasInteracted && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.35 }}
+                  className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 text-[11px] font-mono text-graphite/75"
+                >
+                  <Move3d className="w-3.5 h-3.5 text-signal" />
+                  <span>Arrastra 360°</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
-        {/* Right Centerpiece: Interactive 3D Isometric Monolith */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.94 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.9, delay: 0.14, ease: [0.22, 1, 0.36, 1] }}
-          className="lg:col-span-6"
-        >
-          <IsometricHeroRig />
-        </motion.div>
-      </div>
-
-      {/* Bottom Hairline Telemetry Strip */}
-      <div className="relative z-10 border-t border-obsidian/[0.08] bg-white/80 backdrop-blur-md">
-        <div className="max-w-[1320px] mx-auto px-5 md:px-8 py-4 grid grid-cols-2 md:grid-cols-4 gap-4 divide-y-0 md:divide-x divide-obsidian/[0.08]">
-          {HERO_PROOFS.map((proof) => (
-            <div
-              key={proof.code}
-              className="flex items-baseline gap-2.5 md:pl-6 first:pl-0 justify-center md:justify-start"
-            >
-              <span className="font-mono text-xs sm:text-sm font-semibold text-obsidian tabular-nums">
-                {proof.code}
-              </span>
-              <span className="text-[11px] sm:text-xs text-graphite truncate">
-                {proof.label}
-              </span>
+        {/* Hairline E-Commerce Trust Bar */}
+        <div className="mt-10 pt-7 border-t border-obsidian/[0.08] grid grid-cols-2 lg:grid-cols-4 gap-6">
+          {HERO_TRUST_BAR.map((item) => (
+            <div key={item.metric} className="space-y-0.5">
+              <p className="text-xs font-semibold text-obsidian tracking-tight">
+                {item.metric}
+              </p>
+              <p className="text-xs text-graphite">{item.label}</p>
             </div>
           ))}
         </div>

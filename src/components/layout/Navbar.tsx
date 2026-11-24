@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Box, ChevronDown, Menu, Search, X } from 'lucide-react';
+import { ChevronDown, Menu, Search, ShoppingBag, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BrandLogo } from '../ui/BrandLogo';
 import { useBox } from '../../context/BoxContext';
 import { VERTICALS } from '../../data/catalog';
 
 const SECTION_LINKS = [
-  { to: '/#arquitectura', label: 'Arquitectura' },
-  { to: '/#sistemas', label: 'Sistemas' },
+  { to: '/#arquitectura', label: 'Explorar' },
+  { to: '/#sistemas', label: 'Kits' },
   { to: '/#ecosistema', label: 'Marcas' },
-  { to: '/#b2b', label: 'Portal B2B' },
+  { to: '/#b2b', label: 'Mayoreo' },
 ];
 
 export const Navbar: React.FC = () => {
@@ -58,13 +58,12 @@ export const Navbar: React.FC = () => {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 h-[58px] transition-colors duration-300 backdrop-blur-xl ${
-          isDark
+        className={`fixed top-0 left-0 right-0 z-50 h-[58px] transition-colors duration-300 backdrop-blur-xl ${isDark
             ? 'bg-studio/75 border-b border-white/10 text-white'
             : scrolled
               ? 'bg-white/80 border-b border-obsidian/[0.08] text-obsidian'
               : 'bg-white/60 border-b border-transparent text-obsidian'
-        }`}
+          }`}
       >
         <div className="max-w-[1320px] mx-auto h-full px-5 md:px-8 flex items-center justify-between gap-4">
           {/* Logo */}
@@ -79,17 +78,18 @@ export const Navbar: React.FC = () => {
           {/* Center Navigation */}
           <nav className="hidden lg:flex items-center gap-7" aria-label="Navegación principal">
             <Link
-              to="/#arquitectura"
-              className={`text-[13px] font-medium tracking-[-0.01em] transition-colors duration-200 ${
-                isDark
-                  ? 'text-white/70 hover:text-white'
-                  : 'text-obsidian/70 hover:text-obsidian'
-              }`}
+              to="/tienda"
+              className={`text-[13px] font-medium tracking-[-0.01em] transition-colors duration-200 ${location.pathname === '/tienda'
+                  ? 'text-signal font-semibold'
+                  : isDark
+                    ? 'text-white/80 hover:text-white'
+                    : 'text-obsidian/80 hover:text-obsidian'
+                }`}
             >
-              Arquitectura
+              Tienda
             </Link>
 
-            {/* Especialidades Dropdown */}
+            {/* Categorías Dropdown */}
             <div
               className="relative"
               onMouseEnter={() => setVerticalMenuOpen(true)}
@@ -98,17 +98,15 @@ export const Navbar: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setVerticalMenuOpen((v) => !v)}
-                className={`inline-flex items-center gap-1 text-[13px] font-medium tracking-[-0.01em] transition-colors duration-200 cursor-pointer ${
-                  isDark
+                className={`inline-flex items-center gap-1 text-[13px] font-medium tracking-[-0.01em] transition-colors duration-200 cursor-pointer ${isDark
                     ? 'text-white/70 hover:text-white'
                     : 'text-obsidian/70 hover:text-obsidian'
-                }`}
-              >
-                <span>Especialidades</span>
-                <ChevronDown
-                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                    verticalMenuOpen ? 'rotate-180' : ''
                   }`}
+              >
+                <span>Categorías</span>
+                <ChevronDown
+                  className={`w-3.5 h-3.5 transition-transform duration-200 ${verticalMenuOpen ? 'rotate-180' : ''
+                    }`}
                 />
               </button>
 
@@ -122,22 +120,20 @@ export const Navbar: React.FC = () => {
                     className={`absolute left-1/2 -translate-x-1/2 top-full pt-3 w-[340px] z-50`}
                   >
                     <div
-                      className={`rounded-2xl p-2 border shadow-2xl backdrop-blur-2xl ${
-                        isDark
+                      className={`rounded-2xl p-2 border shadow-2xl backdrop-blur-2xl ${isDark
                           ? 'bg-obsidian/95 border-white/15 text-white'
                           : 'bg-white/95 border-obsidian/10 text-obsidian'
-                      }`}
+                        }`}
                     >
                       {VERTICALS.map((v) => (
                         <Link
                           key={v.id}
                           to={`/especialidad/${v.id}`}
                           onClick={() => setVerticalMenuOpen(false)}
-                          className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-colors ${
-                            isDark
+                          className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-colors ${isDark
                               ? 'hover:bg-white/[0.08]'
                               : 'hover:bg-alabaster'
-                          }`}
+                            }`}
                         >
                           <div className="flex items-center gap-2.5">
                             <span className="font-mono text-[10px] text-signal">
@@ -146,9 +142,8 @@ export const Navbar: React.FC = () => {
                             <span className="font-medium">{v.shortLabel}</span>
                           </div>
                           <span
-                            className={`text-[10px] font-mono ${
-                              isDark ? 'text-silver' : 'text-graphite'
-                            }`}
+                            className={`text-[10px] font-mono ${isDark ? 'text-silver' : 'text-graphite'
+                              }`}
                           >
                             {v.brands[0]}
                           </span>
@@ -164,11 +159,10 @@ export const Navbar: React.FC = () => {
               <Link
                 key={link.to}
                 to={link.to}
-                className={`text-[13px] font-medium tracking-[-0.01em] transition-colors duration-200 ${
-                  isDark
+                className={`text-[13px] font-medium tracking-[-0.01em] transition-colors duration-200 ${isDark
                     ? 'text-white/70 hover:text-white'
                     : 'text-obsidian/70 hover:text-obsidian'
-                }`}
+                  }`}
               >
                 {link.label}
               </Link>
@@ -180,18 +174,16 @@ export const Navbar: React.FC = () => {
             <button
               type="button"
               onClick={() => openSearch('')}
-              className={`hidden sm:inline-flex items-center gap-2.5 h-8 px-3 rounded-full text-[12px] transition-colors border cursor-pointer ${
-                isDark
+              className={`hidden sm:inline-flex items-center gap-2.5 h-8 px-3 rounded-full text-[12px] transition-colors border cursor-pointer ${isDark
                   ? 'bg-white/[0.06] border-white/15 text-white/75 hover:text-white hover:border-white/30'
                   : 'bg-obsidian/[0.04] border-obsidian/10 text-obsidian/70 hover:text-obsidian hover:border-obsidian/25'
-              }`}
+                }`}
             >
               <Search className="w-3.5 h-3.5" />
               <span>Buscar SKU</span>
               <kbd
-                className={`font-mono text-[10px] px-1.5 py-0.5 rounded ${
-                  isDark ? 'bg-white/10 text-white/60' : 'bg-obsidian/[0.06] text-obsidian/50'
-                }`}
+                className={`font-mono text-[10px] px-1.5 py-0.5 rounded ${isDark ? 'bg-white/10 text-white/60' : 'bg-obsidian/[0.06] text-obsidian/50'
+                  }`}
               >
                 ⌘K
               </kbd>
@@ -200,15 +192,14 @@ export const Navbar: React.FC = () => {
             <button
               type="button"
               onClick={openDrawer}
-              aria-label="Abrir Mi Box"
-              className={`relative inline-flex items-center gap-2 h-8 px-3 rounded-full text-[12px] font-medium transition-colors border cursor-pointer ${
-                isDark
+              aria-label="Abrir Carrito"
+              className={`relative inline-flex items-center gap-2 h-8 px-3 rounded-full text-[12px] font-medium transition-colors border cursor-pointer ${isDark
                   ? 'bg-white/[0.06] border-white/15 text-white hover:bg-white/[0.12]'
                   : 'bg-obsidian/[0.04] border-obsidian/10 text-obsidian hover:bg-obsidian/[0.08]'
-              }`}
+                }`}
             >
-              <Box className="w-3.5 h-3.5 text-signal" />
-              <span className="hidden md:inline">Mi Box</span>
+              <ShoppingBag className="w-3.5 h-3.5 text-signal" />
+              <span className="hidden md:inline">Carrito</span>
               {itemCount > 0 && (
                 <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-signal text-white font-mono text-[10px] font-medium tabular-nums">
                   {itemCount}
@@ -219,11 +210,10 @@ export const Navbar: React.FC = () => {
             <button
               type="button"
               onClick={openDistributorModal}
-              className={`hidden sm:inline-flex items-center h-8 px-3.5 rounded-full text-[12px] font-medium transition-all cursor-pointer ${
-                isDark
+              className={`hidden sm:inline-flex items-center h-8 px-3.5 rounded-full text-[12px] font-medium transition-all cursor-pointer ${isDark
                   ? 'bg-white text-obsidian hover:bg-alabaster'
                   : 'bg-obsidian text-white hover:bg-[#242428]'
-              }`}
+                }`}
             >
               Distribuidores
             </button>
@@ -248,15 +238,14 @@ export const Navbar: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.22 }}
-            className={`fixed top-[58px] left-0 right-0 z-40 p-6 backdrop-blur-2xl border-b lg:hidden max-h-[82vh] overflow-y-auto ${
-              isDark
+            className={`fixed top-[58px] left-0 right-0 z-40 p-6 backdrop-blur-2xl border-b lg:hidden max-h-[82vh] overflow-y-auto ${isDark
                 ? 'bg-studio/95 border-white/10 text-white'
                 : 'bg-white/95 border-obsidian/10 text-obsidian'
-            }`}
+              }`}
           >
             <div className="flex flex-col gap-3">
               <p className="font-mono text-[10px] uppercase tracking-widest text-signal">
-                Especialidades
+                Categorías
               </p>
               <div className="grid grid-cols-2 gap-2 pb-2">
                 {VERTICALS.map((v) => (
@@ -274,6 +263,13 @@ export const Navbar: React.FC = () => {
                 ))}
               </div>
 
+              <Link
+                to="/tienda"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-sm font-semibold text-signal py-1.5 border-b border-current/10"
+              >
+                Tienda completa
+              </Link>
               {SECTION_LINKS.map((link) => (
                 <Link
                   key={link.to}

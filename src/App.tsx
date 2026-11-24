@@ -6,6 +6,7 @@ import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { ScrollToTop } from './components/layout/ScrollToTop';
 import { HomePage } from './pages/HomePage';
+import { StorePage } from './pages/StorePage';
 import { VerticalPage } from './pages/VerticalPage';
 import { ProductDetailPage } from './pages/ProductDetailPage';
 import { SystemDetailPage } from './pages/SystemDetailPage';
@@ -24,6 +25,7 @@ export const App: React.FC = () => {
 
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/tienda" element={<StorePage />} />
             <Route path="/especialidad/:verticalId" element={<VerticalPage />} />
             <Route path="/producto/:sku" element={<ProductDetailPage />} />
             <Route path="/sistema/:code" element={<SystemDetailPage />} />

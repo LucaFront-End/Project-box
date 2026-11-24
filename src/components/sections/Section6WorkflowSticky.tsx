@@ -382,8 +382,8 @@ export const Section6WorkflowSticky: React.FC = () => {
                 </AnimatePresence>
 
                 <div className="pt-4 mt-4 border-t border-white/10 flex items-center justify-between text-[11px] text-silver">
-                  <span>Calle 7 #305, Col. Ferrocarril, Guadalajara, Jal.</span>
-                  <span className="font-mono text-white/75">Tel. 33-2308-1080</span>
+                  <span>Centros de distribución nacionales · Envíos asegurados</span>
+                  <span className="font-mono text-white/75">hola@projectbox.mx</span>
                 </div>
               </div>
             </div>

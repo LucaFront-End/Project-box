@@ -1,5 +1,6 @@
 import React from 'react';
 import { Section1Hero } from '../components/sections/Section1Hero';
+import { SectionFeaturedProducts } from '../components/sections/SectionFeaturedProducts';
 import { Section2ExplodedSticky } from '../components/sections/Section2ExplodedSticky';
 import { Section3VerticalsGallery } from '../components/sections/Section3VerticalsGallery';
 import { Section4HorizontalSticky } from '../components/sections/Section4HorizontalSticky';
@@ -12,6 +13,7 @@ export const HomePage: React.FC = () => {
   return (
     <main>
       <Section1Hero />
+      <SectionFeaturedProducts />
       <Section2ExplodedSticky />
       <Section3VerticalsGallery />
       <Section4HorizontalSticky />

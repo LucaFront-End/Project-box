@@ -19,11 +19,11 @@ export const Footer: React.FC = () => {
               <BrandLogo variant="light" size="lg" />
             </Link>
             <p className="text-xs sm:text-sm text-silver leading-relaxed max-w-[320px]">
-              Plataforma de arquitectura tecnológica e ingeniería en telecomunicaciones, seguridad electrónica, energía solar y cómputo en México.
+              Tienda en línea B2B y B2C en México con stock sincronizado en videovigilancia, redes, control de acceso, radiocomunicación y energía solar.
             </p>
             <div className="text-xs text-silver/80 space-y-0.5 font-mono">
-              <p>Calle 7 #305, Col. Ferrocarril, C.P. 44440</p>
-              <p>Guadalajara, Jalisco, México · Tel. 33-2308-1080</p>
+              <p>Envíos asegurados a todo México · Facturación fiscal</p>
+              <p>Contacto comercial · hola@projectbox.mx</p>
             </div>
           </div>
 
@@ -64,9 +64,14 @@ export const Footer: React.FC = () => {
 
             <div className="space-y-3">
               <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/50">
-                Sistemas & Box
+                Tienda & Carrito
               </p>
               <ul className="space-y-2 text-silver">
+                <li>
+                  <Link to="/tienda" className="hover:text-white transition-colors">
+                    Tienda completa
+                  </Link>
+                </li>
                 <li>
                   <Link to="/sistema/PB-NET-01" className="hover:text-white transition-colors">
                     Núcleo UniFi 10G (PB-NET-01)
@@ -75,11 +80,6 @@ export const Footer: React.FC = () => {
                 <li>
                   <Link to="/sistema/PB-SEC-02" className="hover:text-white transition-colors">
                     Perímetro IA 4K (PB-SEC-02)
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/sistema/PB-PWR-03" className="hover:text-white transition-colors">
-                    Microgrid Solar 10kW (PB-PWR-03)
                   </Link>
                 </li>
                 <li>
@@ -97,7 +97,7 @@ export const Footer: React.FC = () => {
                     onClick={openDrawer}
                     className="hover:text-white transition-colors cursor-pointer"
                   >
-                    Mi Project Box (BOM)
+                    Mi Carrito
                   </button>
                 </li>
               </ul>

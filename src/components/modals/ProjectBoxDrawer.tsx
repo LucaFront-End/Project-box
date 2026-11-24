@@ -1,10 +1,21 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Box, CheckCircle2, Minus, Plus, ShieldCheck, Trash2, X } from 'lucide-react';
+import {
+  CheckCircle2,
+  Minus,
+  Plus,
+  ShieldCheck,
+  ShoppingBag,
+  Trash2,
+  X,
+} from 'lucide-react';
 import { useBox } from '../../context/BoxContext';
 import { formatMxn } from '../../data/catalog';
 import { catalogProvider } from '../../services/wixHeadlessAdapter';
 import { QuoteSubmissionResult } from '../../types/commerce';
+
+type PaymentMethod = 'SPEI' | 'Tarjeta MSI' | 'Mercado Pago';
 
 export const ProjectBoxDrawer: React.FC = () => {
   const {
@@ -21,15 +32,21 @@ export const ProjectBoxDrawer: React.FC = () => {
   } = useBox();
 
   const [submitting, setSubmitting] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('Tarjeta MSI');
+  const [submissionKind, setSubmissionKind] = useState<'order' | 'quote'>('order');
   const [quoteResult, setQuoteResult] = useState<QuoteSubmissionResult | null>(null);
 
   const activeTotal = isDistributorPricing ? distributorTotalMxn : subtotalMxn;
   const savingsMxn = subtotalMxn - distributorTotalMxn;
 
-  const handleGenerateQuote = async () => {
+  const handleCheckoutOrQuote = async (kind: 'order' | 'quote') => {
     if (items.length === 0) return;
+    setSubmissionKind(kind);
     setSubmitting(true);
     const result = await catalogProvider.createBoxQuote(items, isDistributorPricing);
+    if (kind === 'order') {
+      result.referenceId = result.referenceId.replace('PB-2026-', 'PB-ORD-');
+    }
     setQuoteResult(result);
     setSubmitting(false);
   };
@@ -57,22 +74,22 @@ export const ProjectBoxDrawer: React.FC = () => {
             <div className="px-6 py-5 border-b border-obsidian/[0.08] flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <span className="w-8 h-8 rounded-xl bg-obsidian text-white flex items-center justify-center">
-                  <Box className="w-4 h-4 text-signal" />
+                  <ShoppingBag className="w-4 h-4 text-signal" />
                 </span>
                 <div>
                   <h3 className="text-sm font-semibold tracking-tight text-obsidian">
-                    Tu Project Box (BOM)
+                    Tu Carrito
                   </h3>
                   <p className="text-[11px] text-graphite">
-                    Lista técnica lista para checkout o cotización
+                    Checkout directo o cotización B2B
                   </p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={closeDrawer}
-                aria-label="Cerrar cajón"
-                className="p-2 rounded-full hover:bg-alabaster text-graphite"
+                aria-label="Cerrar carrito"
+                className="p-2 rounded-full hover:bg-alabaster text-graphite cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -85,7 +102,7 @@ export const ProjectBoxDrawer: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsDistributorPricing(false)}
-                  className={`px-3 py-1 rounded-full text-[11px] font-medium transition-colors ${
+                  className={`px-3 py-1 rounded-full text-[11px] font-medium transition-colors cursor-pointer ${
                     !isDistributorPricing
                       ? 'bg-obsidian text-white'
                       : 'text-graphite hover:text-obsidian'
@@ -96,7 +113,7 @@ export const ProjectBoxDrawer: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsDistributorPricing(true)}
-                  className={`px-3 py-1 rounded-full text-[11px] font-medium transition-colors ${
+                  className={`px-3 py-1 rounded-full text-[11px] font-medium transition-colors cursor-pointer ${
                     isDistributorPricing
                       ? 'bg-signal text-white'
                       : 'text-graphite hover:text-obsidian'
@@ -116,31 +133,40 @@ export const ProjectBoxDrawer: React.FC = () => {
                     Folio {quoteResult.referenceId}
                   </p>
                   <h4 className="text-lg font-semibold text-obsidian tracking-tight">
-                    Cotización de proyecto generada
+                    {submissionKind === 'order'
+                      ? 'Pedido registrado para despacho'
+                      : 'Cotización B2B generada'}
                   </h4>
                   <p className="text-xs text-graphite leading-relaxed">
-                    {quoteResult.itemCount} equipos consolidados por{' '}
+                    {quoteResult.itemCount} equipos por{' '}
                     <strong className="text-obsidian tabular-nums">
                       {formatMxn(quoteResult.estimatedTotalMxn)} MXN
-                    </strong>
-                    . En Etapa 2 este folio sincroniza directo con Wix eCom Checkout y SPEI.
+                    </strong>{' '}
+                    mediante <strong>{paymentMethod}</strong> con envío asegurado nacional.
                   </p>
                   <button
                     type="button"
                     onClick={() => setQuoteResult(null)}
-                    className="mt-2 inline-flex items-center justify-center px-5 py-2 rounded-full bg-obsidian text-white text-xs font-medium"
+                    className="mt-2 inline-flex items-center justify-center px-5 py-2 rounded-full bg-obsidian text-white text-xs font-medium cursor-pointer"
                   >
-                    Seguir editando Box
+                    Seguir comprando
                   </button>
                 </div>
               ) : items.length === 0 ? (
-                <div className="py-16 text-center space-y-2">
+                <div className="py-16 text-center space-y-3">
                   <p className="text-sm font-medium text-obsidian">
-                    Tu Project Box está vacía.
+                    Tu carrito está vacío.
                   </p>
                   <p className="text-xs text-graphite">
-                    Agrega hardware individual desde Verticales o un sistema integrado completo.
+                    Explora la tienda y agrega equipos o kits listos para envío.
                   </p>
+                  <Link
+                    to="/tienda"
+                    onClick={closeDrawer}
+                    className="inline-flex items-center justify-center h-9 px-5 rounded-full bg-obsidian text-white text-xs font-medium"
+                  >
+                    Ir a la tienda
+                  </Link>
                 </div>
               ) : (
                 items.map((item) => {
@@ -173,7 +199,7 @@ export const ProjectBoxDrawer: React.FC = () => {
                           type="button"
                           onClick={() => removeItem(item.id)}
                           aria-label={`Eliminar ${item.name}`}
-                          className="p-1.5 text-graphite hover:text-red-600 transition-colors"
+                          className="p-1.5 text-graphite hover:text-red-600 transition-colors cursor-pointer"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -184,7 +210,7 @@ export const ProjectBoxDrawer: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => updateQuantity(item.id, -1)}
-                            className="p-1 text-graphite hover:text-obsidian"
+                            className="p-1 text-graphite hover:text-obsidian cursor-pointer"
                             aria-label="Disminuir cantidad"
                           >
                             <Minus className="w-3 h-3" />
@@ -195,7 +221,7 @@ export const ProjectBoxDrawer: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => updateQuantity(item.id, 1)}
-                            className="p-1 text-graphite hover:text-obsidian"
+                            className="p-1 text-graphite hover:text-obsidian cursor-pointer"
                             aria-label="Aumentar cantidad"
                           >
                             <Plus className="w-3 h-3" />
@@ -222,17 +248,42 @@ export const ProjectBoxDrawer: React.FC = () => {
             {/* Footer */}
             {items.length > 0 && !quoteResult && (
               <div className="p-6 border-t border-obsidian/[0.08] bg-gallery space-y-4">
-                <div className="space-y-1.5 text-sm">
+                {/* Payment Selector */}
+                <div className="space-y-1.5">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-graphite">
+                    Método de pago
+                  </span>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {(['Tarjeta MSI', 'SPEI', 'Mercado Pago'] as PaymentMethod[]).map(
+                      (method) => (
+                        <button
+                          key={method}
+                          type="button"
+                          onClick={() => setPaymentMethod(method)}
+                          className={`py-1.5 rounded-xl text-[11px] font-medium border transition-colors cursor-pointer ${
+                            paymentMethod === method
+                              ? 'bg-obsidian text-white border-obsidian'
+                              : 'bg-white text-graphite border-obsidian/10 hover:text-obsidian'
+                          }`}
+                        >
+                          {method}
+                        </button>
+                      ),
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-1 text-sm">
                   {isDistributorPricing && (
                     <div className="flex items-center justify-between text-xs text-emerald-700">
-                      <span>Ahorro estimado Distribuidor</span>
+                      <span>Ahorro Distribuidor</span>
                       <span className="font-mono font-medium tabular-nums">
                         -{formatMxn(savingsMxn)} MXN
                       </span>
                     </div>
                   )}
                   <div className="flex items-center justify-between">
-                    <span className="text-graphite">Subtotal estimado</span>
+                    <span className="text-graphite">Total estimado</span>
                     <span className="text-lg font-semibold text-obsidian tabular-nums">
                       {formatMxn(activeTotal)} MXN
                     </span>
@@ -241,24 +292,33 @@ export const ProjectBoxDrawer: React.FC = () => {
 
                 <div className="flex items-center gap-2 text-[11px] text-graphite">
                   <ShieldCheck className="w-3.5 h-3.5 text-signal shrink-0" />
-                  <span>Envío asegurado a todo México · SPEI, Tarjeta o Mercado Crédito</span>
+                  <span>Envío asegurado a todo México · Facturación CFDI</span>
                 </div>
 
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={clearBox}
-                    className="h-11 px-4 rounded-full border border-obsidian/15 text-xs font-medium text-graphite hover:text-obsidian"
+                    title="Vaciar carrito"
+                    className="h-11 px-3.5 rounded-full border border-obsidian/15 text-xs font-medium text-graphite hover:text-obsidian cursor-pointer"
                   >
                     Vaciar
                   </button>
                   <button
                     type="button"
                     disabled={submitting}
-                    onClick={handleGenerateQuote}
-                    className="flex-1 h-11 rounded-full bg-obsidian hover:bg-signal text-white text-sm font-medium transition-colors"
+                    onClick={() => handleCheckoutOrQuote('quote')}
+                    className="h-11 px-4 rounded-full border border-obsidian/20 bg-white hover:border-obsidian text-obsidian text-xs font-medium transition-colors cursor-pointer"
                   >
-                    {submitting ? 'Generando folio...' : 'Generar Cotización de Proyecto'}
+                    Cotizar B2B
+                  </button>
+                  <button
+                    type="button"
+                    disabled={submitting}
+                    onClick={() => handleCheckoutOrQuote('order')}
+                    className="flex-1 h-11 rounded-full bg-signal hover:bg-signal-glow text-white text-xs sm:text-sm font-medium transition-colors cursor-pointer"
+                  >
+                    {submitting ? 'Procesando...' : 'Finalizar compra'}
                   </button>
                 </div>
               </div>
